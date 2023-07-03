@@ -17,13 +17,15 @@ namespace DeveLanCacheUI_SteamDepotFinder
         private const string TokenFilePath = "token.txt";
 
 
-        bool weZijnReady = false;
-
-
         //AppId;AppName;DepotId
         string outputFilePath = "app-depot-output.csv";
         string lastProcessedStoreFile = "lastprocessed.txt";
         int lastProcessedTemp = -1;
+
+
+
+        int deniedCount = 0;
+        int processedCount = 0;
 
         public QrCodeDingLogin()
         {
@@ -77,7 +79,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
 
             int i = 0;
-            int setSize = 100;
+            int setSize = 1000;
 
             var allSteamApps = SteamApi.SteamApiData.applist.apps;
 
@@ -87,6 +89,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 i = allSteamAppsToProcess.Count + 1;
             }
 
+            processedCount = i;
 
             bool almostDone = false;
 
@@ -98,9 +101,9 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
 
 
-                if (weZijnReady)
+                //We need to wait untill all stuff has processed asyncly
+                if (processedCount + deniedCount == i || almostDone)
                 {
-                    weZijnReady = false;
                     if (lastProcessedTemp != -1)
                     {
                         File.WriteAllText(lastProcessedStoreFile, lastProcessedTemp.ToString());
@@ -117,10 +120,12 @@ namespace DeveLanCacheUI_SteamDepotFinder
                     var steamApps = steamClient.GetHandler<SteamApps>();
 
                     var set = allSteamApps.Skip(i).Take(setSize).ToList();
+
+
                     var appsToGet = set.Select(t => (uint)t.appid).ToList();
                     lastProcessedTemp = set.Last().appid;
 
-                    //appsToGet = new List<uint>() { 252490 };
+
 
                     await steamApps.PICSGetAccessTokens(appsToGet, new List<uint>()); // replace with your AppID
 
@@ -137,6 +142,14 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 }
             }
 
+
+            for (int y = 0; y < 30; y++)
+            {
+                Console.WriteLine($"We should be done, but let's give it a few seconds: {y}");
+
+                // in order for the callbacks to get routed, they need to be handled by the manager
+                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+            }
             Console.WriteLine("App exitted");
         }
 
@@ -214,8 +227,6 @@ namespace DeveLanCacheUI_SteamDepotFinder
             Console.WriteLine("Successfully logged on!");
 
 
-            weZijnReady = true;
-
             // at this point, we'd be able to perform actions on Steam
 
 
@@ -238,6 +249,8 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 var outputString = ToOutputStringSanitized(theApp.appid.ToString(), theApp.name, "denied");
                 Console.WriteLine(outputString);
                 File.AppendAllLines(outputFilePath, new List<string>() { outputString });
+
+                deniedCount++;
             }
 
             var allPicsRequests = callback.AppTokens.Select(t => new PICSRequest(t.Key, t.Value)).ToList();
@@ -279,10 +292,9 @@ namespace DeveLanCacheUI_SteamDepotFinder
                         }
                     }
                 }
-            }
 
-            weZijnReady = true;
-            //loggedOn.Set();
+                processedCount++;
+            }
         }
 
         public string ToOutputStringSanitized(string appId, string appName, string depotId)
