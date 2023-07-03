@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeveLanCacheUI_SteamDepotFinder", "DeveLanCacheUI_SteamDepotFinder\DeveLanCacheUI_SteamDepotFinder.csproj", "{A3079CED-9619-4B56-983A-AB1C4939546E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3079CED-9619-4B56-983A-AB1C4939546E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3079CED-9619-4B56-983A-AB1C4939546E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3079CED-9619-4B56-983A-AB1C4939546E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3079CED-9619-4B56-983A-AB1C4939546E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {352A9B55-B238-43D9-88B1-5BF329A98A7E}
+	EndGlobalSection
+EndGlobal
