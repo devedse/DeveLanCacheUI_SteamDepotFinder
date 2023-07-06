@@ -26,6 +26,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         int deniedCount = 0;
         int processedCount = 0;
+        private bool loggedOn;
 
         public QrCodeDingLogin()
         {
@@ -75,6 +76,10 @@ namespace DeveLanCacheUI_SteamDepotFinder
             // initiate the connection
             steamClient.Connect();
 
+            while (!loggedOn)
+            {
+                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+            }
 
 
 
@@ -225,6 +230,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
             }
 
             Console.WriteLine("Successfully logged on!");
+            loggedOn = true;
 
 
             // at this point, we'd be able to perform actions on Steam
