@@ -6,6 +6,8 @@
         {
             Console.WriteLine("Finding Depots...");
 
+            int retries = 0;
+
             while (true)
             {
                 try
@@ -17,9 +19,12 @@
                 catch (TimeoutException ex)
                 {
                     Console.WriteLine("Timeout, retrying...");
+                    retries++;
                 }
 
             }
+
+            Console.WriteLine($"Application completed with {retries} retries");
         }
     }
 }
