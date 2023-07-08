@@ -348,13 +348,13 @@ namespace DeveLanCacheUI_SteamDepotFinder
                             string appName2 = worked2 ? appNameThing2!.name : "unknown";
 
                             var outputString = ToOutputStringSanitized(depfromapp.Value, appName2, dep.Name);
-                            Console.WriteLine(outputString);
+                            //Console.WriteLine(outputString);
                             File.AppendAllLines(outputFilePath, new List<string>() { outputString });
                         }
                         else
                         {
                             var outputString = ToOutputStringSanitized(a.Key.ToString(), appName, dep.Name);
-                            Console.WriteLine(outputString);
+                            //Console.WriteLine(outputString);
                             File.AppendAllLines(outputFilePath, new List<string>() { outputString });
                         }
                     }
