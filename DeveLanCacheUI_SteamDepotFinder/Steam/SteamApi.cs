@@ -12,7 +12,8 @@ namespace DeveLanCacheUI_SteamDepotFinder.Steam
 
         private static SteamApiData LoadSteamApiData()
         {
-            string path = Path.Combine("Steam", "SteamData.json");
+            var subDir = "Steam";
+            string path = Path.Combine(subDir, "SteamData.json");
             if (File.Exists(path))
             {
                 Console.WriteLine($"Found {path} so reading apps from that file.");
@@ -26,6 +27,11 @@ namespace DeveLanCacheUI_SteamDepotFinder.Steam
                 var result = c.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v2/").Result;
                 var resultString = result.Content.ReadAsStringAsync().Result;
                 Console.WriteLine($"Writing result to file. First 1000 chars: {resultString.Substring(0, 1000)}");
+
+                if (!Directory.Exists(subDir))
+                {
+                    Directory.CreateDirectory(subDir);
+                }
 
                 File.WriteAllText(path, resultString);
                 return JsonSerializer.Deserialize<SteamApiData>(resultString);
