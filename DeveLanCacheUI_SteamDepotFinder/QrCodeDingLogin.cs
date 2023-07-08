@@ -18,8 +18,9 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
 
         //AppId;AppName;DepotId
-        string outputFilePath = "app-depot-output.csv";
-        string outputFilePathCleaned = "app-depot-output-cleaned.csv";
+        string outputFolder = "output";
+        string outputFilePath = "output/app-depot-output.csv";
+        string outputFilePathCleaned = "output/app-depot-output-cleaned.csv";
         string lastProcessedStoreFile = "lastprocessed.txt";
         int lastProcessedTemp = -1;
 
@@ -31,6 +32,11 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         public QrCodeDingLogin()
         {
+            if (!Directory.Exists(outputFolder))
+            {
+                Directory.CreateDirectory(outputFolder);
+            }
+
             // create our steamclient instance
             steamClient = new SteamClient();
 
