@@ -27,6 +27,9 @@
             }
 
             Console.WriteLine($"Application completed with {retries} retries");
+            
+            //For some reason threads remain running
+            Environment.Exit(0);
         }
     }
 }

@@ -205,7 +205,6 @@ namespace DeveLanCacheUI_SteamDepotFinder
             Console.WriteLine($"Writing output to: {outputFilePathCleaned}");
             File.WriteAllLines(outputFilePathCleaned, selectifiedSorted);
 
-
             Console.WriteLine("App exitted");
         }
 
