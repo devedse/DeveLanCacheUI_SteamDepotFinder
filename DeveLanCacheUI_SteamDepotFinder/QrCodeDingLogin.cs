@@ -124,7 +124,6 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
                     if (i == allSteamApps.Length)
                     {
-                        isRunning = false;
                         break;
                     }
 
@@ -142,31 +141,12 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 else if (lastUpdate.AddSeconds(60) < DateTime.Now)
                 {
                     Console.WriteLine("No update within 60 seconds. Killing everything and retrying....");
-                    steamClient.Disconnect();
-
-                    for (int y = 0; y < 30; y++)
-                    {
-                        if (isRunning != false)
-                        {
-                            Console.WriteLine($"Disconnected, waiting for isRunning == false: {y}");
-
-                            // in order for the callbacks to get routed, they need to be handled by the manager
-                            manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
-                        }
-                    }
+                    DisconnectAndWaitForDisconnectedMax30Seconds();
                     throw new TimeoutException("no response, please retry");
                 }
             }
 
-
-            for (int y = 0; y < 30; y++)
-            {
-                Console.WriteLine($"We should be done, but let's give it a few seconds: {y}");
-
-                // in order for the callbacks to get routed, they need to be handled by the manager
-                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
-            }
-
+            DisconnectAndWaitForDisconnectedMax30Seconds();
 
             Console.WriteLine("Cleaning up everything...");
 
@@ -193,6 +173,23 @@ namespace DeveLanCacheUI_SteamDepotFinder
             Console.WriteLine("App exitted");
         }
 
+        private void DisconnectAndWaitForDisconnectedMax30Seconds()
+        {
+            Console.WriteLine("Disconnecting...");
+            steamClient.Disconnect();
+
+            for (int y = 0; y < 30; y++)
+            {
+                if (isRunning == false)
+                {
+                    break;
+                }
+                Console.WriteLine($"Waiting for SteamClient to Disconnect... {y}");
+
+                // in order for the callbacks to get routed, they need to be handled by the manager
+                manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+            }
+        }
 
         async void OnConnected(SteamClient.ConnectedCallback callback)
         {
