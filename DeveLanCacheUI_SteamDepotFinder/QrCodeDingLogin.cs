@@ -123,6 +123,8 @@ namespace DeveLanCacheUI_SteamDepotFinder
                         File.WriteAllText(lastProcessedStoreFile, lastProcessedTemp.ToString());
                     }
 
+                    lastUpdate = DateTime.Now;
+
 
                     Console.WriteLine($"Progress: {i}/{allSteamApps.Length} {Math.Round(i / (double)allSteamApps.Length * 100.0, 2)}%");
 
