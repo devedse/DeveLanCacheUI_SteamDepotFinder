@@ -103,57 +103,40 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
             processedCount = i;
 
-            bool almostDone = false;
-
             DateTime lastUpdate = DateTime.Now;
 
             // create our callback handling loop
             while (isRunning)
             {
-
                 // in order for the callbacks to get routed, they need to be handled by the manager
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
 
 
                 //We need to wait untill all stuff has processed asyncly
-                if (processedCount + deniedCount == i || almostDone)
+                if (processedCount + deniedCount == i)
                 {
                     if (lastProcessedTemp != -1)
                     {
                         File.WriteAllText(lastProcessedStoreFile, lastProcessedTemp.ToString());
                     }
 
-                    lastUpdate = DateTime.Now;
-
-
                     Console.WriteLine($"Progress: {i}/{allSteamApps.Length} {Math.Round(i / (double)allSteamApps.Length * 100.0, 2)}%");
 
-                    if (almostDone == true)
+                    if (i == allSteamApps.Length)
                     {
                         isRunning = false;
                         break;
                     }
+
                     var steamApps = steamClient.GetHandler<SteamApps>();
 
                     var set = allSteamApps.Skip(i).Take(setSize).ToList();
-
-
                     var appsToGet = set.Select(t => (uint)t.appid).ToList();
+
                     lastProcessedTemp = set.Last().appid;
 
-
-
-                    await steamApps.PICSGetAccessTokens(appsToGet, new List<uint>()); // replace with your AppID
-
-                    //await Task.Run(() => _currentGetCompleted.Wait());
-
-                    if (set.Count != setSize)
-                    {
-                        Console.WriteLine("Completed");
-
-                        almostDone = true;
-                    }
-
+                    lastUpdate = DateTime.Now;
+                    await steamApps.PICSGetAccessTokens(appsToGet, new List<uint>());
                     i += set.Count;
                 }
                 else if (lastUpdate.AddSeconds(60) < DateTime.Now)
