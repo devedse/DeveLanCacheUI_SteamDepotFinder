@@ -152,7 +152,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
                         almostDone = true;
                     }
 
-                    i += setSize;
+                    i += set.Count;
                 }
                 else if (lastUpdate.AddSeconds(60) > DateTime.Now)
                 {
