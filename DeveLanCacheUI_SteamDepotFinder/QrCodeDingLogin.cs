@@ -156,7 +156,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
                     i += set.Count;
                 }
-                else if (lastUpdate.AddSeconds(60) > DateTime.Now)
+                else if (lastUpdate.AddSeconds(60) < DateTime.Now)
                 {
                     Console.WriteLine("No update within 60 seconds. Killing everything and retrying....");
                     steamClient.Disconnect();
