@@ -10,14 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
-    <PackageReference Include="QRCoder" Version="1.4.3" />
-    <PackageReference Include="SteamKit2" Version="2.5.0-Beta.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Steam\SteamData.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\DeveLanCacheUI_SteamDepotFinder\DeveLanCacheUI_SteamDepotFinder.csproj" />
   </ItemGroup>
 
 </Project>

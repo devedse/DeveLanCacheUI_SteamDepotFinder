@@ -19,6 +19,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         //AppId;AppName;DepotId
         string outputFilePath = "app-depot-output.csv";
+        string outputFilePathCleaned = "app-depot-output-cleaned.csv";
         string lastProcessedStoreFile = "lastprocessed.txt";
         int lastProcessedTemp = -1;
 
@@ -98,6 +99,8 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
             bool almostDone = false;
 
+            DateTime lastUpdate = DateTime.Now;
+
             // create our callback handling loop
             while (isRunning)
             {
@@ -145,6 +148,12 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
                     i += setSize;
                 }
+                else if (lastUpdate.AddSeconds(60) < DateTime.Now)
+                {
+                    Console.WriteLine("No update within 60 seconds. Killing everything and retrying....");
+                    steamClient.Disconnect();
+                    throw new TimeoutException("no response, please retry");
+                }
             }
 
 
@@ -155,15 +164,62 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 // in order for the callbacks to get routed, they need to be handled by the manager
                 manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
             }
+
+
+            Console.WriteLine("Cleaning up everything...");
+
+            var allLines = File.ReadAllLines(outputFilePath);
+            Console.WriteLine($"Total lines: {allLines.Length}");
+            var allLinesDistinct = allLines.Distinct().ToList();
+            Console.WriteLine($"Duplicate lines removed (E.g. SteamWorks redist stuff): {allLines.Length - allLinesDistinct.Count}");
+
+            var selectified = allLinesDistinct.Select(t =>
+            {
+                var splitted = t.Split(';');
+                var canParseAppId = int.TryParse(splitted[0], out var appId);
+                var canParseDepotId = int.TryParse(splitted[1], out var depotId);
+                return new { Original = t, AppId = canParseAppId ? appId : 0, DepotId = canParseDepotId ? depotId : 0 };
+            }).ToList();
+
+            Console.WriteLine("Sorting...");
+
+            var selectifiedSorted = selectified.OrderBy(t => t.AppId).ThenBy(t => t.DepotId).Select(t => t.Original).ToList();
+
+            Console.WriteLine($"Writing output to: {outputFilePathCleaned}");
+            File.WriteAllLines(outputFilePathCleaned, selectifiedSorted);
+
+
             Console.WriteLine("App exitted");
         }
 
 
         async void OnConnected(SteamClient.ConnectedCallback callback)
         {
+            TokenStore? token = null;
+
+            var envToken = Environment.GetEnvironmentVariable("STEAMTOKEN");
+
+            if (envToken != null)
+            {
+                token = JsonSerializer.Deserialize<TokenStore>(envToken);
+            }
+            else if (File.Exists(TokenFilePath))
+            {
+                var tokenStoreSerialized = File.ReadAllText(TokenFilePath);
+                token = JsonSerializer.Deserialize<TokenStore>(tokenStoreSerialized);
+            }
 
 
-            if (!File.Exists(TokenFilePath))
+            if (token != null)
+            {
+                // Logon to Steam with the access token we have received
+                steamUser.LogOn(new SteamUser.LogOnDetails
+                {
+                    Username = token.AccountName,
+                    AccessToken = token.RefreshToken,
+                });
+            }
+            else
             {
 
                 // Start an authentication session by requesting a link
@@ -197,18 +253,6 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 var tokenStore = new TokenStore() { AccountName = pollResponse.AccountName, RefreshToken = pollResponse.RefreshToken };
                 var tokenStoreSerialized = JsonSerializer.Serialize(tokenStore, new JsonSerializerOptions() { WriteIndented = true });
                 File.WriteAllText(TokenFilePath, tokenStoreSerialized);
-            }
-            else
-            {
-                var tokenStoreSerialized = File.ReadAllText(TokenFilePath);
-                var tokenStore = JsonSerializer.Deserialize<TokenStore>(tokenStoreSerialized);
-
-                // Logon to Steam with the access token we have received
-                steamUser.LogOn(new SteamUser.LogOnDetails
-                {
-                    Username = tokenStore.AccountName,
-                    AccessToken = tokenStore.RefreshToken,
-                });
             }
         }
 

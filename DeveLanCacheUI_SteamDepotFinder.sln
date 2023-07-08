@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeveLanCacheUI_SteamDepotFinder", "DeveLanCacheUI_SteamDepotFinder\DeveLanCacheUI_SteamDepotFinder.csproj", "{A3079CED-9619-4B56-983A-AB1C4939546E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeveLanCacheUI_SteamDepotFinder", "DeveLanCacheUI_SteamDepotFinder\DeveLanCacheUI_SteamDepotFinder.csproj", "{A3079CED-9619-4B56-983A-AB1C4939546E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeveLanCacheUI_SteamDepotFinder.Tests", "DeveLanCacheUI_SteamDepotFinder.Tests\DeveLanCacheUI_SteamDepotFinder.Tests.csproj", "{D55FAFCE-F509-46F6-A48D-99D2F835E7A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeveLanCacheUI_SteamDepotFinder.ConsoleApp", "DeveLanCacheUI_SteamDepotFinder.ConsoleApp\DeveLanCacheUI_SteamDepotFinder.ConsoleApp.csproj", "{C84BE927-3EE8-46C4-BB84-0F1CFA727DAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{A3079CED-9619-4B56-983A-AB1C4939546E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3079CED-9619-4B56-983A-AB1C4939546E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3079CED-9619-4B56-983A-AB1C4939546E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D55FAFCE-F509-46F6-A48D-99D2F835E7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D55FAFCE-F509-46F6-A48D-99D2F835E7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D55FAFCE-F509-46F6-A48D-99D2F835E7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D55FAFCE-F509-46F6-A48D-99D2F835E7A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C84BE927-3EE8-46C4-BB84-0F1CFA727DAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C84BE927-3EE8-46C4-BB84-0F1CFA727DAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C84BE927-3EE8-46C4-BB84-0F1CFA727DAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C84BE927-3EE8-46C4-BB84-0F1CFA727DAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

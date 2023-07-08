@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DeveLanCacheUI_SteamDepotFinder": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
