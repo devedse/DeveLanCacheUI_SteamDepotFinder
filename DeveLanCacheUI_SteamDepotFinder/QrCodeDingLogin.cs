@@ -313,7 +313,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
             {
                 var theApp = SteamApi.SteamAppDict[(int)denied];
                 var outputString = ToOutputStringSanitized(theApp.appid.ToString(), theApp.name, "denied");
-                Console.WriteLine(outputString);
+                //Console.WriteLine(outputString);
                 File.AppendAllLines(outputFilePath, new List<string>() { outputString });
 
                 deniedCount++;
