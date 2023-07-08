@@ -158,6 +158,17 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 {
                     Console.WriteLine("No update within 60 seconds. Killing everything and retrying....");
                     steamClient.Disconnect();
+
+                    for (int y = 0; y < 30; y++)
+                    {
+                        if (isRunning != false)
+                        {
+                            Console.WriteLine($"Disconnected, waiting for isRunning == false: {y}");
+
+                            // in order for the callbacks to get routed, they need to be handled by the manager
+                            manager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
+                        }
+                    }
                     throw new TimeoutException("no response, please retry");
                 }
             }
