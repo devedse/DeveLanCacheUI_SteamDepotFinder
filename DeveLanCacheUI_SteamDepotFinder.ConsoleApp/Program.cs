@@ -4,6 +4,8 @@
     {
         public static async Task Main(string[] args)
         {
+            Console.WriteLine($"DeveLanCacheUI_SteamDepotFinder version: {typeof(Program).Assembly.GetName().Version}");
+
             Console.WriteLine("Finding Depots...");
 
             int retries = 0;
