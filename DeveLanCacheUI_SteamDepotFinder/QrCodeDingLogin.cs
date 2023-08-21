@@ -22,7 +22,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
         string outputFilePath = "output/app-depot-output.csv";
         string outputFilePathCleaned = "output/app-depot-output-cleaned.csv";
         string lastProcessedStoreFile = "lastprocessed.txt";
-        int lastProcessedTemp = -1;
+        uint? lastProcessedTemp = null;
 
 
 
@@ -62,13 +62,13 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         public async Task GoLogin()
         {
-            var lastAppIdProcessed = -1;
+            uint? lastAppIdProcessed = null;
             if (File.Exists(lastProcessedStoreFile))
             {
                 var lastAppProcessed = File.ReadAllText(lastProcessedStoreFile).Trim();
                 if (!string.IsNullOrWhiteSpace(lastAppProcessed))
                 {
-                    lastAppIdProcessed = int.Parse(lastAppProcessed);
+                    lastAppIdProcessed = uint.Parse(lastAppProcessed);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
             var allSteamApps = SteamApi.SteamApiData.applist.apps;
 
-            if (lastAppIdProcessed != -1)
+            if (lastAppIdProcessed != null)
             {
                 var allSteamAppsToProcess = allSteamApps.TakeWhile(t => t.appid != lastAppIdProcessed).ToList();
                 i = allSteamAppsToProcess.Count + 1;
@@ -130,7 +130,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
                     var steamApps = steamClient.GetHandler<SteamApps>();
 
                     var set = allSteamApps.Skip(i).Take(setSize).ToList();
-                    var appsToGet = set.Select(t => (uint)t.appid).ToList();
+                    var appsToGet = set.Select(t => t.appid).ToList();
 
                     lastProcessedTemp = set.Last().appid;
 
@@ -193,65 +193,67 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         async void OnConnected(SteamClient.ConnectedCallback callback)
         {
-            TokenStore? token = null;
+            //TokenStore? token = null;
 
-            var envToken = Environment.GetEnvironmentVariable("STEAMTOKEN");
+            //var envToken = Environment.GetEnvironmentVariable("STEAMTOKEN");
 
-            if (envToken != null)
-            {
-                token = JsonSerializer.Deserialize<TokenStore>(envToken);
-            }
-            else if (File.Exists(TokenFilePath))
-            {
-                var tokenStoreSerialized = File.ReadAllText(TokenFilePath);
-                token = JsonSerializer.Deserialize<TokenStore>(tokenStoreSerialized);
-            }
+            //if (envToken != null)
+            //{
+            //    token = JsonSerializer.Deserialize<TokenStore>(envToken);
+            //}
+            //else if (File.Exists(TokenFilePath))
+            //{
+            //    var tokenStoreSerialized = File.ReadAllText(TokenFilePath);
+            //    token = JsonSerializer.Deserialize<TokenStore>(tokenStoreSerialized);
+            //}
+
+            steamUser.LogOnAnonymous();
 
 
-            if (token != null)
-            {
-                // Logon to Steam with the access token we have received
-                steamUser.LogOn(new SteamUser.LogOnDetails
-                {
-                    Username = token.AccountName,
-                    AccessToken = token.RefreshToken,
-                });
-            }
-            else
-            {
+            //if (token != null)
+            //{
+            //    // Logon to Steam with the access token we have received
+            //    steamUser.LogOn(new SteamUser.LogOnDetails
+            //    {
+            //        Username = token.AccountName,
+            //        AccessToken = token.RefreshToken,
+            //    });
+            //}
+            //else
+            //{
 
-                // Start an authentication session by requesting a link
-                var authSession = await steamClient.Authentication.BeginAuthSessionViaQRAsync(new AuthSessionDetails());
+            //    // Start an authentication session by requesting a link
+            //    var authSession = await steamClient.Authentication.BeginAuthSessionViaQRAsync(new AuthSessionDetails());
 
-                // Steam will periodically refresh the challenge url, this callback allows you to draw a new qr code
-                authSession.ChallengeURLChanged = () =>
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("Steam has refreshed the challenge url");
+            //    // Steam will periodically refresh the challenge url, this callback allows you to draw a new qr code
+            //    authSession.ChallengeURLChanged = () =>
+            //    {
+            //        Console.WriteLine();
+            //        Console.WriteLine("Steam has refreshed the challenge url");
 
-                    DrawQRCode(authSession);
-                };
+            //        DrawQRCode(authSession);
+            //    };
 
-                // Draw current qr right away
-                DrawQRCode(authSession);
+            //    // Draw current qr right away
+            //    DrawQRCode(authSession);
 
-                // Starting polling Steam for authentication response
-                // This response is later used to logon to Steam after connecting
-                var pollResponse = await authSession.PollingWaitForResultAsync();
+            //    // Starting polling Steam for authentication response
+            //    // This response is later used to logon to Steam after connecting
+            //    var pollResponse = await authSession.PollingWaitForResultAsync();
 
-                Console.WriteLine($"Logging in as '{pollResponse.AccountName}'...");
+            //    Console.WriteLine($"Logging in as '{pollResponse.AccountName}'...");
 
-                // Logon to Steam with the access token we have received
-                steamUser.LogOn(new SteamUser.LogOnDetails
-                {
-                    Username = pollResponse.AccountName,
-                    AccessToken = pollResponse.RefreshToken,
-                });
+            //    // Logon to Steam with the access token we have received
+            //    steamUser.LogOn(new SteamUser.LogOnDetails
+            //    {
+            //        Username = pollResponse.AccountName,
+            //        AccessToken = pollResponse.RefreshToken,
+            //    });
 
-                var tokenStore = new TokenStore() { AccountName = pollResponse.AccountName, RefreshToken = pollResponse.RefreshToken };
-                var tokenStoreSerialized = JsonSerializer.Serialize(tokenStore, new JsonSerializerOptions() { WriteIndented = true });
-                File.WriteAllText(TokenFilePath, tokenStoreSerialized);
-            }
+            //    var tokenStore = new TokenStore() { AccountName = pollResponse.AccountName, RefreshToken = pollResponse.RefreshToken };
+            //    var tokenStoreSerialized = JsonSerializer.Serialize(tokenStore, new JsonSerializerOptions() { WriteIndented = true });
+            //    File.WriteAllText(TokenFilePath, tokenStoreSerialized);
+            //}
         }
 
         void OnDisconnected(SteamClient.DisconnectedCallback callback)
@@ -293,7 +295,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
             foreach (var denied in callback.AppTokensDenied)
             {
-                var theApp = SteamApi.SteamAppDict[(int)denied];
+                var theApp = SteamApi.SteamAppDict[denied];
                 var outputString = ToOutputStringSanitized(theApp.appid.ToString(), theApp.name, "denied");
                 //Console.WriteLine(outputString);
                 File.AppendAllLines(outputFilePath, new List<string>() { outputString });
@@ -318,19 +320,24 @@ namespace DeveLanCacheUI_SteamDepotFinder
                 {
                     if (int.TryParse(dep.Name, out var _) && dep.Value == null)
                     {
-                        var worked = SteamApi.SteamAppDict.TryGetValue((int)a.Key, out var appNameThing);
+                        var worked = SteamApi.SteamAppDict.TryGetValue(a.Key, out var appNameThing);
 
                         string appName = worked ? appNameThing!.name : "unknown";
 
                         if (dep.Children.Any(t => t.Name == "depotfromapp"))
                         {
-                            var depfromapp = dep.Children.First(t => t.Name == "depotfromapp");
-                            var worked2 = SteamApi.SteamAppDict.TryGetValue(depfromapp.AsInteger(), out var appNameThing2);
-                            string appName2 = worked2 ? appNameThing2!.name : "unknown";
+                            var depfromappString = dep.Children.First(t => t.Name == "depotfromapp").AsString();
+                            var depfromappStringNumberified = new string(depfromappString?.Where(t => char.IsDigit(t)).ToArray());
+                            var worked2 = uint.TryParse(depfromappStringNumberified, out var depfromapp);
+                            if (worked2)
+                            {
+                                var worked3 = SteamApi.SteamAppDict.TryGetValue(depfromapp, out var appNameThing2);
+                                string appName2 = worked3 ? appNameThing2!.name : "unknown";
 
-                            var outputString = ToOutputStringSanitized(depfromapp.Value, appName2, dep.Name);
-                            //Console.WriteLine(outputString);
-                            File.AppendAllLines(outputFilePath, new List<string>() { outputString });
+                                var outputString = ToOutputStringSanitized(depfromappStringNumberified, appName2, dep.Name);
+                                //Console.WriteLine(outputString);
+                                File.AppendAllLines(outputFilePath, new List<string>() { outputString });
+                            }
                         }
                         else
                         {
