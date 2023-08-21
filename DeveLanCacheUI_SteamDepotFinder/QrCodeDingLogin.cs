@@ -327,10 +327,13 @@ namespace DeveLanCacheUI_SteamDepotFinder
                         if (dep.Children.Any(t => t.Name == "depotfromapp"))
                         {
                             var depfromappString = dep.Children.First(t => t.Name == "depotfromapp").AsString();
+
+                            //Some apps have some strange characters in the depot id's: https://steamdb.info/app/1106980/depots/
                             var depfromappStringNumberified = new string(depfromappString?.Where(t => char.IsDigit(t)).ToArray());
                             var worked2 = uint.TryParse(depfromappStringNumberified, out var depfromapp);
-                            
+
                             //Assume that if depfromapp == 0, it's a redistributable that we've already obtained elsewhere
+                            //Example: https://steamdb.info/app/2203540/depots/
                             if (worked2 && depfromapp != 0)
                             {
                                 var worked3 = SteamApi.SteamAppDict.TryGetValue(depfromapp, out var appNameThing2);
