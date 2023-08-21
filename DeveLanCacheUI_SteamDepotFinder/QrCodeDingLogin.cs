@@ -318,7 +318,7 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
                 foreach (var dep in depots.Children)
                 {
-                    if (int.TryParse(dep.Name, out var _) && dep.Value == null)
+                    if (uint.TryParse(dep.Name, out var _) && dep.Value == null)
                     {
                         var worked = SteamApi.SteamAppDict.TryGetValue(a.Key, out var appNameThing);
 
