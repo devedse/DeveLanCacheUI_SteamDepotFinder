@@ -329,7 +329,9 @@ namespace DeveLanCacheUI_SteamDepotFinder
                             var depfromappString = dep.Children.First(t => t.Name == "depotfromapp").AsString();
                             var depfromappStringNumberified = new string(depfromappString?.Where(t => char.IsDigit(t)).ToArray());
                             var worked2 = uint.TryParse(depfromappStringNumberified, out var depfromapp);
-                            if (worked2)
+                            
+                            //Assume that if depfromapp == 0, it's a redistributable that we've already obtained elsewhere
+                            if (worked2 && depfromapp != 0)
                             {
                                 var worked3 = SteamApi.SteamAppDict.TryGetValue(depfromapp, out var appNameThing2);
                                 string appName2 = worked3 ? appNameThing2!.name : "unknown";
@@ -354,6 +356,11 @@ namespace DeveLanCacheUI_SteamDepotFinder
 
         public string ToOutputStringSanitized(string appId, string appName, string depotId)
         {
+            if (appId == "0")
+            {
+
+            }
+
             appId = appId ?? "";
             appName = appName ?? "";
             depotId = depotId ?? "";
