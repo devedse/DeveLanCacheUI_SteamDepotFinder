@@ -4,7 +4,29 @@ namespace DeveLanCacheUI_SteamDepotFinder.Steam
 {
     public static class SteamApi
     {
-        private static readonly Lazy<Dictionary<uint, App>> _steamAppDict = new Lazy<Dictionary<uint, App>>(() => SteamApiData.applist.apps.ToDictionary(t => t.appid, t => t));
+        private static readonly Lazy<Dictionary<uint, App>> _steamAppDict = new Lazy<Dictionary<uint, App>>(() =>
+        {
+            //.ToDictionary(t => t.appid, t => t)
+            //Previously we had the code mentioned above but this sometimes resulted in a duplicate appid (still weird but whatever this should solve it)
+
+            var allSteamApps = SteamApiData.applist.apps;
+
+            var outputDict = new Dictionary<uint, App>();
+
+            foreach (var app in allSteamApps)
+            {
+                if (outputDict.ContainsKey(app.appid))
+                {
+                    Console.WriteLine($"Found duplicate appid: {app.appid} with name: {app.name}");
+                }
+                else
+                {
+                    outputDict.Add(app.appid, app);
+                }
+            }
+
+            return outputDict;
+        });
         private static readonly Lazy<SteamApiData> _steamApiData = new Lazy<SteamApiData>(LoadSteamApiData);
 
         public static SteamApiData SteamApiData => _steamApiData.Value;
