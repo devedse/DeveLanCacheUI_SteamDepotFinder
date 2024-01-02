@@ -11,7 +11,7 @@ jobs:
     - name: Generate build number
       if: github.ref == 'refs/heads/master'
       id: buildnumber
-      uses: einaregilsson/build-number@v3
+      uses: onyxmueller/build-tag-number@v1
       with:
         token: ${{secrets.github_token}}
 
@@ -55,7 +55,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: dotnet restore
       run: dotnet restore DeveLanCacheUI_SteamDepotFinder.sln
     - name: dotnet build
@@ -71,7 +71,7 @@ jobs:
     - name: Setup .NET Core @ Latest
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x     
+        dotnet-version: 8.0.x     
     - uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
