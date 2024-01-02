@@ -2,7 +2,6 @@
 using QRCoder;
 using SteamKit2;
 using SteamKit2.Authentication;
-using System.Text.Json;
 using static SteamKit2.SteamApps;
 
 namespace DeveLanCacheUI_SteamDepotFinder
