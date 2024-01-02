@@ -108,11 +108,11 @@ jobs:
       shell: pwsh
   
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: DeveLanCacheUI_SteamDepotFinder7z
         path: ./Scripts/Output/DeveLanCacheUI_SteamDepotFinder.7z
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: DeveLanCacheUI_SteamDepotFinderZip
         path: ./Scripts/Output/DeveLanCacheUI_SteamDepotFinder.zip
