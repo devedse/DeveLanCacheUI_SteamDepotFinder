@@ -15,7 +15,7 @@ DeleteFileIfExists $7zFilePath
 DeleteFileIfExists $zipFilePath
 DeleteFolderIfExists $outputDir
 
-$buildPath = Join-Path $solutionRoot "DeveLanCacheUI_SteamDepotFinder.ConsoleApp\bin\Release\net8.0"
+$buildPath = Join-Path $solutionRoot "DeveLanCacheUI_SteamDepotFinder.ConsoleApp\bin\Release\net9.0"
 
 # Exclude *.pdb files
 7z a -mm=Deflate -mfb=258 -mpass=15 "$zipFilePath" "$buildPath\*" '-x!*.pdb'
