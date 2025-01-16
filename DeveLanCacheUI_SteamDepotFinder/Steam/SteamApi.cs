@@ -1,63 +1,72 @@
-﻿using System.Text.Json;
+﻿//using System.Text.Json;
 
-namespace DeveLanCacheUI_SteamDepotFinder.Steam
-{
-    public static class SteamApi
-    {
-        private static readonly Lazy<Dictionary<uint, App>> _steamAppDict = new Lazy<Dictionary<uint, App>>(() =>
-        {
-            //.ToDictionary(t => t.appid, t => t)
-            //Previously we had the code mentioned above but this sometimes resulted in a duplicate appid (still weird but whatever this should solve it)
+//namespace DeveLanCacheUI_SteamDepotFinder.Steam
+//{
 
-            var allSteamApps = SteamApiData.applist.apps;
+//    public static class SteamApi
+//    {
+//        private static readonly Lazy<Dictionary<uint, App>> _steamAppDict = new Lazy<Dictionary<uint, App>>(() =>
+//        {
+//            //.ToDictionary(t => t.appid, t => t)
+//            //Previously we had the code mentioned above but this sometimes resulted in a duplicate appid (still weird but whatever this should solve it)
 
-            var outputDict = new Dictionary<uint, App>();
+//            var allSteamApps = SteamApiData.applist.apps;
 
-            foreach (var app in allSteamApps)
-            {
-                if (outputDict.ContainsKey(app.appid))
-                {
-                    Console.WriteLine($"Found duplicate appid: {app.appid} with name: {app.name}");
-                }
-                else
-                {
-                    outputDict.Add(app.appid, app);
-                }
-            }
+//            var outputDict = new Dictionary<uint, App>();
 
-            return outputDict;
-        });
-        private static readonly Lazy<SteamApiData> _steamApiData = new Lazy<SteamApiData>(LoadSteamApiData);
+//            foreach (var app in allSteamApps)
+//            {
+//                if (outputDict.ContainsKey(app.appid))
+//                {
+//                    var theDuplicate = outputDict[app.appid];
+//                    if (theDuplicate.name != app.name)
+//                    {
+//                        Console.WriteLine($"Found duplicate appid: {app.appid} with name: {app.name} and duplicate name: {theDuplicate.name}");
+//                    }
+//                    else
+//                    {
+//                        Console.WriteLine($"Found duplicate appid: {app.appid} with name: {app.name}");
+//                    }
+//                }
+//                else
+//                {
+//                    outputDict.Add(app.appid, app);
+//                }
+//            }
 
-        public static SteamApiData SteamApiData => _steamApiData.Value;
-        public static Dictionary<uint, App> SteamAppDict => _steamAppDict.Value;
+//            return outputDict;
+//        });
+//        private static readonly Lazy<SteamApiData> _steamApiData = new Lazy<SteamApiData>(LoadSteamApiData);
 
-        private static SteamApiData LoadSteamApiData()
-        {
-            var subDir = "Steam";
-            string path = Path.Combine(subDir, "SteamData.json");
-            if (File.Exists(path))
-            {
-                Console.WriteLine($"Found {path} so reading apps from that file.");
-                var json = File.ReadAllText(path);
-                return JsonSerializer.Deserialize<SteamApiData>(json);
-            }
-            else
-            {
-                Console.WriteLine($"Could not find {path}, so obtaining new SteamApi Data...");
-                using var c = new HttpClient();
-                var result = c.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v2/").Result;
-                var resultString = result.Content.ReadAsStringAsync().Result;
-                Console.WriteLine($"Writing result to file. First 1000 chars: {resultString.Substring(0, 1000)}");
+//        public static SteamApiData SteamApiData => _steamApiData.Value;
+//        public static Dictionary<uint, App> SteamAppDict => _steamAppDict.Value;
 
-                if (!Directory.Exists(subDir))
-                {
-                    Directory.CreateDirectory(subDir);
-                }
+//        private static SteamApiData LoadSteamApiData()
+//        {
+//            var subDir = "Steam";
+//            string path = Path.Combine(subDir, "SteamData.json");
+//            if (File.Exists(path))
+//            {
+//                Console.WriteLine($"Found {path} so reading apps from that file.");
+//                var json = File.ReadAllText(path);
+//                return JsonSerializer.Deserialize<SteamApiData>(json);
+//            }
+//            else
+//            {
+//                Console.WriteLine($"Could not find {path}, so obtaining new SteamApi Data...");
+//                using var c = new HttpClient();
+//                var result = c.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v2/").Result;
+//                var resultString = result.Content.ReadAsStringAsync().Result;
+//                Console.WriteLine($"Writing result to file. First 1000 chars: {resultString.Substring(0, 1000)}");
 
-                File.WriteAllText(path, resultString);
-                return JsonSerializer.Deserialize<SteamApiData>(resultString);
-            }
-        }
-    }
-}
+//                if (!Directory.Exists(subDir))
+//                {
+//                    Directory.CreateDirectory(subDir);
+//                }
+
+//                File.WriteAllText(path, resultString);
+//                return JsonSerializer.Deserialize<SteamApiData>(resultString);
+//            }
+//        }
+//    }
+//}

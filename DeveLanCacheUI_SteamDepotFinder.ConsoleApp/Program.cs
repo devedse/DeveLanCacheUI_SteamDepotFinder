@@ -1,32 +1,36 @@
-﻿namespace DeveLanCacheUI_SteamDepotFinder.ConsoleApp
+﻿using DeveLanCacheUI_SteamDepotFinder.NewVersion;
+using DeveLanCacheUI_SteamDepotFinder.NewVersion.Steam;
+using Microsoft.Extensions.Logging;
+
+namespace DeveLanCacheUI_SteamDepotFinder.ConsoleApp
 {
-    public static class Program
+    public class Program
     {
         public static async Task Main(string[] args)
         {
             Console.WriteLine($"DeveLanCacheUI_SteamDepotFinder version: {typeof(Program).Assembly.GetName().Version}");
 
-            Console.WriteLine("Finding Depots...");
-
-            int retries = 0;
-
-            while (true)
+            using var loggerFactory = LoggerFactory.Create(builder =>
             {
-                try
-                {
-                    var qrCodeLoginner = new QrCodeDingLogin();
-                    await qrCodeLoginner.GoLogin();
-                    break;
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine("Timeout, retrying...");
-                    retries++;
-                }
+                builder
+                    .AddFilter("Microsoft", LogLevel.Warning)
+                    .AddFilter("System", LogLevel.Warning)
+                    .AddFilter("DeveLanCacheUI_SteamDepotFinder", LogLevel.Information)
+                    .AddConsole();
+            });
 
-            }
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogInformation("Starting processing...");
 
-            Console.WriteLine($"Application completed with {retries} retries");
+            var steamSession = new Steam3Session(loggerFactory.CreateLogger<Steam3Session>());
+            steamSession.LoginToSteam();
+            var appInfoHandler = new AppInfoHandler(steamSession, loggerFactory.CreateLogger<AppInfoHandler>());
+
+            var steamDepotObtainer = new SteamDepotObtainer(steamSession, appInfoHandler, loggerFactory.CreateLogger<SteamDepotObtainer>());
+
+            await steamDepotObtainer.GoObtainDepotsAndWriteToFile();
+
+
 
             //For some reason threads remain running
             Environment.Exit(0);
