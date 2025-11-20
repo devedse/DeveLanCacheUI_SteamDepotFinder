@@ -43,9 +43,26 @@ namespace DeveLanCacheUI_SteamDepotFinder.NewVersion.Steam
             var storeApps = await _storeServiceApi.GetAllAppsAsync();
             var apiApps = storeApps.Select(a => a.ToApp()).ToList();
 
+            // Check for duplicates before creating dictionary
+            var duplicates = apiApps.GroupBy(a => a.appid)
+                                    .Where(g => g.Count() > 1)
+                                    .ToList();
+
+            if (duplicates.Any())
+            {
+                _logger.LogWarning("Found {duplicateCount} duplicate app IDs:", duplicates.Count);
+                foreach (var duplicate in duplicates)
+                {
+                    _logger.LogWarning("  AppID {appId} appears {count} times: {names}", 
+                        duplicate.Key, 
+                        duplicate.Count(), 
+                        string.Join(", ", duplicate.Select(a => $"'{a.name}'")));
+                }
+            }
+
             _cachedAppNames = apiApps.DistinctBy(t => t.appid).ToDictionary(t => t.appid, t => t);
 
-            _logger.LogInformation("Retrieved {appCount} apps", apiApps.Count);
+            _logger.LogInformation("Retrieved {appCount} apps ({distinctCount} distinct)", apiApps.Count, _cachedAppNames.Count);
 
             // Save app list to JSON
             await SaveAppListToJson(storeApps);
