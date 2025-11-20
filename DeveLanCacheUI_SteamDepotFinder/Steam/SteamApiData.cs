@@ -13,7 +13,7 @@
     public class App
     {
         public uint appid { get; set; }
-        public string name { get; set; }
+        public string name { get; set; } = string.Empty;
     }
 
 }

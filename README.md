@@ -11,6 +11,21 @@ Run them all through the SteamKit stuff to get DepotId's.
 Store them in CSV file.
 Cleanup CSV file.
 
+## Steam API Key (Required)
+
+A Steam API key is required. You can specify it as a console argument or as the `STEAM_API_KEY` environment variable.
+
+Get your API key at: https://steamcommunity.com/dev/apikey
+
+```bash
+# Console argument
+DeveLanCacheUI_SteamDepotFinder.ConsoleApp YOUR_API_KEY
+
+# Environment variable
+set STEAM_API_KEY=YOUR_API_KEY
+DeveLanCacheUI_SteamDepotFinder.ConsoleApp
+```
+
 ## Related projects
 
 | Project | Explanation |

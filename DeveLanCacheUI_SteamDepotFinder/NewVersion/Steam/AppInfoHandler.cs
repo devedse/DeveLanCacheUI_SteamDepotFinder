@@ -1,6 +1,7 @@
 ﻿using DeveLanCacheUI_SteamDepotFinder.Steam;
 using Microsoft.Extensions.Logging;
 using SteamKit2;
+using System.Text.Json;
 
 namespace DeveLanCacheUI_SteamDepotFinder.NewVersion.Steam
 {
@@ -13,11 +14,13 @@ namespace DeveLanCacheUI_SteamDepotFinder.NewVersion.Steam
     {
         private readonly Steam3Session _steam3Session;
         private readonly ILogger<AppInfoHandler> _logger;
+        private readonly global::DeveLanCacheUI_SteamDepotFinder.Steam.SteamStoreServiceApi _storeServiceApi;
 
-        public AppInfoHandler(Steam3Session steam3Session, ILogger<AppInfoHandler> logger)
+        public AppInfoHandler(Steam3Session steam3Session, ILogger<AppInfoHandler> logger, global::DeveLanCacheUI_SteamDepotFinder.Steam.SteamStoreServiceApi storeServiceApi)
         {
             _steam3Session = steam3Session;
             _logger = logger;
+            _storeServiceApi = storeServiceApi;
         }
 
         private Dictionary<uint, App> _cachedAppNames = new Dictionary<uint, App>();
@@ -35,22 +38,46 @@ namespace DeveLanCacheUI_SteamDepotFinder.NewVersion.Steam
         public async Task<List<App>> EnsureAppsAreLoaded()
         {
             _logger.LogInformation("Retrieving all known AppIds");
+            _logger.LogInformation("Using Steam Store Service API with provided API key");
 
-            using var steamAppsApi = _steam3Session.Configuration.GetAsyncWebAPIInterface("ISteamApps");
-            var response = await steamAppsApi.CallAsync(HttpMethod.Get, "GetAppList", 2);
-
-            var apiApps = response["apps"].Children.Select(app =>
-                new App()
-                {
-                    appid = app["appid"].AsUnsignedInteger(),
-                    name = app["name"].AsString() ?? "Unknown"
-                }
-                ).ToList();
+            var storeApps = await _storeServiceApi.GetAllAppsAsync();
+            var apiApps = storeApps.Select(a => a.ToApp()).ToList();
 
             _cachedAppNames = apiApps.DistinctBy(t => t.appid).ToDictionary(t => t.appid, t => t);
 
             _logger.LogInformation("Retrieved {appCount} apps", apiApps.Count);
+
+            // Save app list to JSON
+            await SaveAppListToJson(storeApps);
+
             return apiApps;
+        }
+
+        private async Task SaveAppListToJson(List<StoreServiceApp> apps)
+        {
+            const string outputDirectory = "output";
+            var appListOutputPath = Path.Combine(outputDirectory, "steam-applist.json");
+            
+            _logger.LogInformation("Saving app list to {OutputPath}", appListOutputPath);
+
+            var outputData = new
+            {
+                response = new
+                {
+                    apps = apps
+                }
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            Directory.CreateDirectory(outputDirectory);
+            var json = JsonSerializer.Serialize(outputData, options);
+            await File.WriteAllTextAsync(appListOutputPath, json);
+
+            _logger.LogInformation("App list saved successfully");
         }
 
         public async Task<List<App>> RetrieveAllAppIds2()
